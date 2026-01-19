@@ -115,7 +115,20 @@ public class ProfileServiceImpl implements ProfileService{
 
     @Override
     public void verifyOtp(String email, String otp) {
+        UserEntity existingUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with this email: "+email));
+        if (existingUser.getVerifyOtp() == null || !existingUser.getVerifyOtp().equals(otp)){
+            throw new RuntimeException("Invalid OTP");
+        }
+        if (existingUser.getVerifyOtpExpireAt() < System.currentTimeMillis()){
+            throw new RuntimeException("OTP Expired");
 
+        }
+        existingUser.setIsAccountVerified(true);
+        existingUser.setVerifyOtpExpireAt(0L);
+        existingUser.setVerifyOtp(null);
+
+        userRepository.save(existingUser);
     }
 
     @Override
