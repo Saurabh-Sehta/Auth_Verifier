@@ -1,6 +1,9 @@
-import React, { useState } from 'react'
+import React, {useContext, useState } from 'react'
 import { assets } from '../assets/assets'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import axios from 'axios';
+import {AppContext} from '../context/AppContext';
+import { toast } from 'react-toastify';
 
 const Login = () => {
   const [isCreateAccount, setIsCreateAccount] = useState(false);
@@ -8,10 +11,41 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  useState(false);
+  const {backendURL, setIsLoggedIn, getUserData} = useContext(AppContext);
+  const navigate = useNavigate();
 
-  const onSubmitHandler = () => {
-    
+  const onSubmitHandler = async (e) => {
+    e.preventDefault();
+    axios.defaults.withCredentials = true;
+    setLoading(true);
+    try{
+      if (isCreateAccount) {
+        // register APi
+        const response = await axios.post(`${backendURL}/register`, {name, email, password});
+        if(response.status === 201){
+          navigate("/");
+          toast.success("Account created successfully.")
+        } else{
+          toast.error("Email already exits");
+        }
+      } else {
+        //login API
+        const response = await axios.post(`${backendURL}/login`, {email, password});
+        if(response.status === 200){
+          setIsLoggedIn(true);
+          getUserData();
+          navigate("/");
+          toast.success("Logged in successfully.")
+        } else {
+          toast.error("Email or password is wrong!")
+        }
+      }
+    } catch (err){
+        toast.error(err?.response?.data?.message || "Something went wrong");
+        console.log(err);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -49,18 +83,18 @@ const Login = () => {
           <h2 className='text-center mb-4'>
             {isCreateAccount ? "Create Account" : "Login"}
           </h2>
-          <form>
+          <form onSubmit={onSubmitHandler}>
             {
               isCreateAccount && (
                 <div className='mb-3'>
                   <label htmlFor="fullName" className='for-label'>Full Name</label>
-                  <input type="text" id="fullName" className='form-control' placeholder='Enter full name' required onChange={(e) => setEmail(e.target.value)} value={fullName}/>
+                  <input type="text" id="fullName" className='form-control' placeholder='Enter full name' required onChange={(e) => setName(e.target.value)} value={name}/>
                 </div>
               )
             }
               <div className='mb-3'>
                 <label htmlFor="email" className='for-label'>Email Id</label>
-                <input type="email" id="email" className='form-control' placeholder='Enter email address' required onChange={(e) => setName(e.target.value)} value={email}/>
+                <input type="email" id="email" className='form-control' placeholder='Enter email address' required onChange={(e) => setEmail(e.target.value)} value={email}/>
               </div>
               <div className='mb-3'>
                 <label htmlFor="password" className='for-label'>Password</label>
@@ -75,7 +109,7 @@ const Login = () => {
               }
               
 
-              <button type='submit' className='btn btn-primary w-100'>
+              <button type='submit' className='btn btn-primary w-100' disabled={loading}>
                 {isCreateAccount ? "Sign Up" : "Login"}
               </button>
           </form>

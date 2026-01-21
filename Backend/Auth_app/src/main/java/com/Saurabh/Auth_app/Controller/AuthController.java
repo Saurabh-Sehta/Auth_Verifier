@@ -6,6 +6,7 @@ import com.Saurabh.Auth_app.Util.JwtUtil;
 import com.Saurabh.Auth_app.io.AuthRequest;
 import com.Saurabh.Auth_app.io.AuthResponse;
 import com.Saurabh.Auth_app.io.ResetPasswordRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -116,5 +117,19 @@ public class AuthController {
         } catch (Exception e){
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response){
+        ResponseCookie cookie = ResponseCookie.from("jwt", "")
+                .httpOnly(true)
+                .secure(false)
+                .maxAge(0)
+                .sameSite("Strict")
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body("Logout Successfully!");
     }
 }
