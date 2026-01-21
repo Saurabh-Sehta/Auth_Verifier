@@ -60,7 +60,7 @@ public class ProfileServiceImpl implements ProfileService{
         userRepository.save(existingUser);
 
         try {
-            emailService.sendResetOtpEmail(existingUser.getEmail(), otp);
+            emailService.sendResetOtpEmail(existingUser.getEmail(), existingUser.getName(), otp);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -107,7 +107,7 @@ public class ProfileServiceImpl implements ProfileService{
         userRepository.save(existingUser);
 
         try{
-            emailService.sendOtpEmail(existingUser.getEmail(), otp);
+            emailService.sendOtpEmail(existingUser.getEmail(), existingUser.getName(), otp);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

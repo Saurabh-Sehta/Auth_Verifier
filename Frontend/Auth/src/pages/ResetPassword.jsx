@@ -63,6 +63,36 @@ const ResetPassword = () => {
     }
   }
 
+  const handleVerifyOtp = () => {
+    const otp = inputRef.current.map(input => input.value).join("");
+    if(otp.length !== 6){
+      toast.error("Please enter the complete OTP");
+      return;
+    }
+
+    setOtp(otp);
+    setIsOtpSubmitted(true);
+  }
+
+  const onSubmitNewPassword = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try { 
+      const reponse = await axios.post(`${backendURL}/reset-password`, {email, otp, newPassword});
+      if(reponse.status === 200){
+        toast.success("Password reset successful. Please login with your new password.");
+        navigate("/login");
+      } else {
+        toast.error("Unable to reset password. Please try again.");
+      }
+    } catch (err) {
+      toast.error("Something went wrong! Please try again later.");
+      console.log(err);
+    } finally {
+      setLoading(false);
+    } 
+  }
+
   return (
     
     <>
@@ -126,7 +156,7 @@ const ResetPassword = () => {
               ))}
             </div>
 
-            <button className='btn btn-primary w-100 fw-semibold' disabled={loading}>
+            <button className='btn btn-primary w-100 fw-semibold' disabled={loading} onClick={handleVerifyOtp}>
               {loading ? "Verifying..." : "Verify email"}
             </button>
           </div>
@@ -142,7 +172,7 @@ const ResetPassword = () => {
                 >
                     <h4>New Password</h4>
                     <p className='mb-4'>Enter your new password below</p>
-                    <form>
+                    <form onSubmit={onSubmitNewPassword}>
                       <div className='input-group mb-4 bg-secondary bg-opacity-10 rounded-pill'>
                         <span className='input-group-text bg-transparent border-0 ps-4'>
                           <i className='bi bi-person-fill-lock'></i>
@@ -156,7 +186,7 @@ const ResetPassword = () => {
                           required 
                         />
                       </div>
-                      <button type='submit' className='btn btn-primary w-100 py-2'>
+                      <button type='submit' className='btn btn-primary w-100 py-2' disabled={loading}> 
                         {loading ? "Submitting..." : "Submit"}
                       </button>
                     </form>

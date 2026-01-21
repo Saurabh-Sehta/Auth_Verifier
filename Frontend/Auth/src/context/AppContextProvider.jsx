@@ -12,6 +12,7 @@ const AppContextProvider = ({ children }) => {
 
     const getUserData = async () => {
         try{
+            axios.defaults.withCredentials = true;
             const response = await axios.get(backendURL+"/profile");
             if(response.status === 200){
                 setUserData(response.data);
@@ -35,10 +36,10 @@ const AppContextProvider = ({ children }) => {
             }
         } catch (err) {
             if (err.response) {
-                const msg = error.response.data?.message || "Authentication checked failed"; 
-                toast.error(msg);
+                const msg = err.response.data?.message || "Authentication checked failed"; 
+                // toast.error(msg);
             } else {
-                toast.error("Something went wrong!");
+                // toast.error("Something went wrong!");
             }
             setIsLoggedIn(false);
         }
