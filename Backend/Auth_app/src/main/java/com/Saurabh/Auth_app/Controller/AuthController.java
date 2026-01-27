@@ -119,23 +119,8 @@ public class AuthController {
         }
     }
 
-//    @PostMapping("/logout")
-//    public ResponseEntity<?> logout(HttpServletResponse response){
-//        ResponseCookie cookie = ResponseCookie.from("jwt", "")
-//                .httpOnly(true)
-//                .secure(false)
-//                .maxAge(0)
-//                .sameSite("Strict")
-//                .build();
-//
-//        return ResponseEntity.ok()
-//                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-//                .body("Logout Successfully!");
-//    }
-
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
-
         ResponseCookie cookie = ResponseCookie.from("jwt", "")
                 .httpOnly(true)
                 .secure(false)
