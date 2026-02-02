@@ -12,6 +12,8 @@ const EmailVerify = ({}) => {
   const {getUserData, isLoggedIn, userData, backendURL} = useContext(AppContext);
   const navigate = useNavigate();
 
+  const email = localStorage.getItem("verifyEmail") || "";
+
   const handleChange = (e, index) => {
     const value = e.target.value.replace(/\D/, "");
     e.target.value = value;
@@ -46,12 +48,11 @@ const EmailVerify = ({}) => {
     }
     setLoading(true);
     try {
-      axios.defaults.withCredentials = true;
-      const response = await axios.post(`${backendURL}/verify-otp`, {otp});
+      const response = await axios.post(`${backendURL}/verify-otp`, {otp, email});
       if (response.status === 200) {
         toast.success("Email Verification Successfull");
-        getUserData();
-        navigate("/");
+        localStorage.setItem("emailVerified", "true");
+        navigate("/login");
       } else {
         toast.error("Invalid OTP!");
       }
@@ -63,9 +64,9 @@ const EmailVerify = ({}) => {
     }
   }
 
-  useEffect(() => {
-    isLoggedIn && userData && userData.isAccountVerified && navigate("/");
-  }, [isLoggedIn, userData, navigate]);
+  // useEffect(() => {
+  //   isLoggedIn && userData && userData.isAccountVerified && navigate("/");
+  // }, [isLoggedIn, userData, navigate]);
 
   return (
     <>
